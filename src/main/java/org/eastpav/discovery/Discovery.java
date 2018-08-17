@@ -1,27 +1,30 @@
 package org.eastpav.discovery;
 
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.zookeeper.data.Stat;
+
 import java.util.List;
 
 /**
  * 发现服务接口
  *
  * 发现服务定义与zookeeper(curator)交互的接口。其实现类及其子类在这些接口的
- * 基础上可以构建出节点注册、配置管理、命名服务、服务发现、集群消息广播等功能。
+ * 基础上可以构建出节点注册、配置管理、命名服务、服务发现、集群消息广播、选举
+ * 等功能。
  * 注：以上功能使用同一个Discovery实现类实例
  *
  * Discovery接口需实现：
- * 1. 获取节点类型的配置数据（未解析）
- * 2. 监听节点类型的配置更新
- * 3. 监听兄弟节点（同类型节点）
- * 4. 监听朋友节点（不同类型的协作节点）
+ * 1、 主动获取指定path的数据
+ * 2、 增加监听path，不需要其数据
+ * 3、 增加监听path，需要其数据
+ * 4、 创建path（节点），不设置数据
+ * 5、 创建path（节点），设置数据
+ * 6、 更新path（节点数据）
+ * 7、 删除path（节点）
  *
- * 机制1：
- * 当使用如Spring之类的Bean容器来实例化Discovery的实现类时，可能系统中的其余
- * 部分的初始化需要大量工作而它们很可能在Discovery之后实例化。在这种情形下系统
- * 还不能处理任何请求，而Discovery向zookeeper的出席消息却已经发布。使朋友（协作）
- * 节点把它当做已经正常服务的节点而向它发布数据。解决方案是让Discovery延迟出席。
- * 如在Spring的ApplicationListener<ApplicationReadyEvent>监听器中发布节点
- * 出席消息。出席后，Node对象才会生成。
  *
  * 机制2：
  * 若系统的功能模块依赖于Node，当机制1生效时，其他功能模块在初始化时不能得到Node
@@ -36,47 +39,70 @@ import java.util.List;
 public interface Discovery {
 
     /**
-     * 获取本节点
+     * 获取指定节点的数据
+     * @param path 指定的节点路径
      * @return 代表本节点的Node对象
      */
-    Node getNode();
+    String getPathData(String path);
 
     /**
-     * 添加监听的节点类型
-     * @param nodeType 要监听的节点类型
+     * 获取指定节点的状态
+     * @param path 节点路径
+     * @return 节点状态
      */
-    void addWatchNode(String nodeType);
+    Stat getPathStat(String path);
 
     /**
-     * 获取本节点的配置
-     * 若有环境属性，则getConfig方法仅获取本节点所在的环境的配置。
-     * @return 节点参数配置对象
+     * 获取指定节点的子节点列表
+     * @param parentPath 子节点的父节点
+     * @return 子节点列表
      */
-    Config getConfig();
+    List<String> getChildren(String parentPath);
 
     /**
-     * 节点配置改变通知方法。
-     * zookeeper上的节点配置改变时调用。
-     * @param data 配置数据
+     * 添加监听路径，在该路径下的子节点事件将被监听到
+     * @param parentPath 要监听的节点父路径
+     * @param cacheListener 子节点监听器
+     * @return 子节点监听句柄
      */
-    void onConfigUpdated(String data);
+    PathChildrenCache addChildrenWatcher(String parentPath, PathChildrenCacheListener cacheListener);
 
     /**
-     * 获取本节点同类型的节点。
-     * @return 兄弟节点列表
+     * 添加监听节点路径，该路径节点的事件将被监听到
+     * @param path 要监听的节点路径
+     * @param cacheListener 节点数据监听器
+     * @return 节点监听句柄
      */
-    List<Node> getBrothers();
+    NodeCache addNodeWatcher(String path, NodeCacheListener cacheListener);
 
     /**
-     * 获取本节点的朋友（协作）的节点。
-     * 朋友节点可能包含多种类型
-     * @return 朋友节点列表
+     * 创建子节点，并设置数据
+     * @param path 在该path下创建子节点。
+     * @param durable 是否是持久化节点。
+     * @param data 写入节点路径的数据。
+     * @param force 数据强制写入。若节点已存在时（持久化节点，如配置节点）,可能需要强制写入。
+     * @return 节点路径。
      */
-    List<Node> getFriends();
-
+    String createPath(String path, boolean durable, boolean sequential, String data, boolean force);
 
     /**
-     * 节点出席消息，发送出席消息表示节点已经可以处理请求或数据。
+     * 更新节点的数据
+     * @param path 节点路径
+     * @param data 更新的数据
+     * @return true - 成功， false - 失败
      */
-    void present();
+    boolean updatePathData(String path, String data);
+
+    /**
+     * 删除节点。
+     * @param path 要删除的节点路径
+     */
+    void deletePath(String path);
+
+    /**
+     * 检查节点是否存在
+     * @param path 节点路径
+     * @return true - 存在， false - 不存在
+     */
+    boolean pathAvailable(String path);
 }

@@ -4,7 +4,7 @@
 
   <groupId>org.eastpav</groupId>
   <artifactId>discovery</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1.0</version>
   <packaging>jar</packaging>
 
   <name>discovery</name>
@@ -13,6 +13,13 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>Eclipse Paho Repo</id>
+      <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -41,6 +48,21 @@
       <groupId>org.apache.curator</groupId>
       <artifactId>curator-recipes</artifactId>
       <version>2.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20160810</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>21.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.paho</groupId>
+      <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+      <version>1.2.0</version>
     </dependency>
   </dependencies>
 

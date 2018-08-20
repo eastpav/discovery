@@ -21,7 +21,7 @@ public class DummyManager {
 
     public void start() {
         Discoverer discoverer = new Discoverer();
-        discoverer.init("121.196.201.204:32181");
+        discoverer.init("116.62.67.216:31004");
         String conf = "param1=this is param36\n" +
                 "param2=1\n" +
                 "param4=2\n" +
@@ -36,12 +36,12 @@ public class DummyManager {
                 "param5=1;2;3000\n" +
                 "param6=forYou-50;forMe-50";
 
-        String configPath = PathUtil.makeConfigPath("test", "deviceSave");
+        String configPath = PathUtil.makeConfigPath("test", "deviceHolder");
         String globalConfigPath = PathUtil.makeConfigPath("test");
 
         Config config = discoverer.createServerConfig(configPath, conf, false);
 
-        Config config2 = discoverer.createServerConfig(globalConfigPath, conf, false);
+        //Config config2 = discoverer.createServerConfig(globalConfigPath, conf, false);
 
 
         System.out.println("ServerConfig create\n\n");
@@ -64,12 +64,12 @@ public class DummyManager {
             e.printStackTrace();
         }
 
-        try {
-            System.out.println("ServerConfig[global] update\n\n");
-            config2.update(conf2);
-        }catch (ConfigNotSupportedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            System.out.println("ServerConfig[global] update\n\n");
+//            config2.update(conf2);
+//        }catch (ConfigNotSupportedException e) {
+//            e.printStackTrace();
+//        }
 
         String parentPath = PathUtil.makeNodeListenPath("test", "deviceSave");
         List<String> nodeList = discoverer.getChildren(parentPath);

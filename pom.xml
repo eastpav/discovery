@@ -4,7 +4,7 @@
 
   <groupId>org.eastpav</groupId>
   <artifactId>discovery</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
   <packaging>jar</packaging>
 
   <name>discovery</name>

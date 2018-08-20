@@ -136,12 +136,23 @@ public class BaseDiscovery implements Discovery {
     }
 
     @Override
-    public NodeCache addNodeWatcher(String path, NodeCacheListener cacheListener) {
+    public NodeCache addNodeWatcher(String path, NodeCacheListener cacheListener, String defaultConfig) {
         try {
             log.info("NodeWatcher:{}", path);
             NodeCache cache = new NodeCache(client, path);
             cache.getListenable().addListener(cacheListener);
             cache.start();
+
+            if(cache.getCurrentData() == null) {
+                // 节点配置path不存在，则创建该path并使用节点配置默认值设置path数据
+                createPath(path, true, false, defaultConfig, false);
+            } else if(cache.getCurrentData().getData() == null) {
+                //节点配置path存在，但无数据，则使用节点配置默认值设置path数据
+                updatePathData(path, defaultConfig);
+            } else {
+                log.info("path:{}", cache.getCurrentData().getPath());
+            }
+
             cacheList.add(cache);
             return cache;
         } catch (Exception e) {

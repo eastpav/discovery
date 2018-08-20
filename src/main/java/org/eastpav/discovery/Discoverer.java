@@ -1,11 +1,6 @@
 package org.eastpav.discovery;
 
-import org.apache.curator.framework.recipes.cache.NodeCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.eastpav.discovery.config.Config;
-import org.eastpav.discovery.config.ClientConfigImpl;
-import org.eastpav.discovery.config.NodeConfig;
-import org.eastpav.discovery.config.ServerConfigImpl;
+import org.eastpav.discovery.config.*;
 import org.eastpav.discovery.node.Node;
 import org.eastpav.discovery.node.NodeImpl;
 
@@ -19,7 +14,7 @@ import org.eastpav.discovery.node.NodeImpl;
  */
 public class Discoverer extends BaseDiscovery {
 
-    public Node newNode(String environment, String nodeType, boolean autoPresent, boolean enableGlobalConfig, Object configBean) {
+    public Node newNode(String environment, String nodeType, boolean autoPresent, boolean enableGlobalConfig, ConfigBean configBean) {
         Node node = new NodeImpl(this, environment, nodeType, configBean, enableGlobalConfig);
 
         node.getConfig();
@@ -44,19 +39,6 @@ public class Discoverer extends BaseDiscovery {
         configPath = createConfigPath(configPath, true, initialConf, force);
         return new ServerConfigImpl(configPath, initialConf, this);
     }
-
-//    public void addNodeWatcher(String parentPath, String nodeType,  Node node) {
-//        //addWatcher(nodeParentPath, nodeType, handler);
-//        PathChildrenCache childrenCache = addChildrenWatcher(parentPath, node);
-//        node.addCache(nodeType, childrenCache);
-//    }
-
-//    public String addConfigWatcher(String configPath, String nodeType, NodeConfig config) {
-//        NodeCache nodeCache = addNodeWatcher(configPath, config);
-//        config.addCache(nodeType, nodeCache);
-//
-//        return configPath;
-//    }
 
     private String createNodePath(String path, boolean durable, String nodeData) {
         return createPath(path, durable, true, nodeData, false);

@@ -11,6 +11,7 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.eastpav.discovery.Discoverer;
 import org.eastpav.discovery.config.Config;
 import org.eastpav.discovery.config.ClientConfigImpl;
+import org.eastpav.discovery.config.ConfigBean;
 import org.eastpav.discovery.config.NodeConfig;
 import org.eastpav.discovery.mq.EMqClient;
 import org.eastpav.discovery.mq.MessageListener;
@@ -70,9 +71,9 @@ public class NodeImpl implements Node {
 
     /**
      * 配置对象，节点的配置参数对象
-     * 它可以是java bean或java对象，它仅包含配置基本数据对象。
+     * 它可以是实现ConfigBean接口的java bean或java对象，它仅包含配置基本数据对象。
      */
-    private Object configBean;
+    private ConfigBean configBean;
 
     private List<PresentListener> listeners;
     private List<ServerNodeListener> nodesListeners;
@@ -102,7 +103,7 @@ public class NodeImpl implements Node {
         this(discoverer, environment, nodeType, null, false);
     }
 
-    public NodeImpl(Discoverer discoverer, String environment, String nodeType, Object configBean, boolean enableGlobalConfig) {
+    public NodeImpl(Discoverer discoverer, String environment, String nodeType, ConfigBean configBean, boolean enableGlobalConfig) {
         this.environment = environment;
         this.nodeName = "noName";
         this.simpleName = "noName";
@@ -174,7 +175,7 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public NodeConfig getConfig(Object configBean) {
+    public NodeConfig getConfig(ConfigBean configBean) {
         if(configBean == null) {
             throw new IllegalArgumentException("configBean must be not null.");
         }
@@ -182,8 +183,7 @@ public class NodeImpl implements Node {
         if(config == null) {
             String configPath = PathUtil.makeConfigPath(environment, nodeType);
             config = new ClientConfigImpl(configPath, configBean, discoverer, false);
-            //discoverer.addConfigWatcher(configPath, nodeType, config);
-            NodeCache nodeCache = discoverer.addNodeWatcher(configPath, config);
+            NodeCache nodeCache = discoverer.addNodeWatcher(configPath, config, configBean.getConfigString());
             config.addCache(nodeType, nodeCache);
         }
 
@@ -202,14 +202,12 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public NodeConfig getGlobalConfig(Object configBean) {
+    public NodeConfig getGlobalConfig(ConfigBean configBean) {
         if(enableGlobalConfig) {
             if (globalConfig == null) {
                 String globalConfigPath = PathUtil.makeConfigPath(environment);
                 globalConfig = new ClientConfigImpl(globalConfigPath, configBean, discoverer, true);
-                //discoverer.addConfigWatcher(globalConfigPath, nodeType, globalConfig);
-
-                NodeCache nodeCache = discoverer.addNodeWatcher(globalConfigPath, globalConfig);
+                NodeCache nodeCache = discoverer.addNodeWatcher(globalConfigPath, globalConfig, configBean.getGlobalConfigString());
                 globalConfig.addCache(nodeType, nodeCache);
             }
         }

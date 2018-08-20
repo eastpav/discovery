@@ -71,9 +71,10 @@ public interface Discovery {
      * 添加监听节点路径，该路径节点的事件将被监听到
      * @param path 要监听的节点路径
      * @param cacheListener 节点数据监听器
+     * @param defaultConfig 节点配置字符串，默认值
      * @return 节点监听句柄
      */
-    NodeCache addNodeWatcher(String path, NodeCacheListener cacheListener);
+    NodeCache addNodeWatcher(String path, NodeCacheListener cacheListener, String defaultConfig);
 
     /**
      * 创建子节点，并设置数据

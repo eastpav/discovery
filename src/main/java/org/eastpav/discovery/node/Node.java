@@ -3,6 +3,7 @@ package org.eastpav.discovery.node;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.eastpav.discovery.config.Config;
+import org.eastpav.discovery.config.ConfigBean;
 import org.eastpav.discovery.config.NodeConfig;
 import org.eastpav.discovery.mq.MessageListener;
 import org.eastpav.discovery.util.PathInfo;
@@ -71,11 +72,11 @@ public interface Node extends PathChildrenCacheListener {
 
     /**
      * 从配置中心获取节点的配置(依照默认的zookeeper拓扑结构定义节点的配置路径)
-     * @param localConfigBean 本地默认配置对象，若无远程配置数据则使用本地配置
+     * @param configBean 本地默认配置对象，若无远程配置数据则使用本地配置
      *                        当远程配置数据更新时，覆盖该配置
      * @return 节点的配置
      */
-    NodeConfig getConfig(Object localConfigBean);
+    NodeConfig getConfig(ConfigBean configBean);
 
     /**
      * 获取节点对象的集群间全局Config引用
@@ -85,11 +86,11 @@ public interface Node extends PathChildrenCacheListener {
 
     /**
      * 获取节点对象的集群间全局Config引用
-     * @param localConfigBean 本地默认配置对象，若无远程配置数据则使用本地配置
+     * @param configBean 本地默认配置对象，若无远程配置数据则使用本地配置
      *                        当远程配置数据更新时，覆盖该配置
      * @return 节点的配置
      */
-    NodeConfig getGlobalConfig(Object localConfigBean);
+    NodeConfig getGlobalConfig(ConfigBean configBean);
 
     /**
      * 获取节点的运行环境

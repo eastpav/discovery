@@ -120,11 +120,11 @@ public class ClientConfigImpl implements NodeConfig {
     @Override
     public void nodeChanged() throws Exception {
         String data = new String(nodeCache.getCurrentData().getData());
-        //log.info("Config changed {}:{}", nodeCache.getCurrentData().getPath(), data);
+        log.debug("Config changed {}:{}", nodeCache.getCurrentData().getPath(), data);
         if(autoMode) {
             configChange(data);
             retrieved = true;
-            System.out.println(this.hashCode());
+            //System.out.println(this.hashCode());
             if(changeCallback != null) {
                 changeCallback.configChanged();
             }
